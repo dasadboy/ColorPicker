@@ -1,0 +1,38 @@
+body {
+  background-color: white;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 5px;
+  width: 100%;
+}
+
+body * {
+  position: relative;
+}
+
+.section {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 5px;
+  margin-bottom: 10px;
+  border: 2px solid black;
+}
+
+canvas {
+  margin: 5px;
+}
+
+.display {
+  padding: 5px;
+  min-width: 100px;
+  width: auto;
+  background-color: white;
+  margin: 5px;
+  border: 2px solid black;
+  font-family: monospace;
+}
+
+.name {
+  font-size: 14px;
+  margin-left: 5px;
+}
