@@ -2,8 +2,38 @@
 <html>
 <head>
   <title>Color Picker Demo Page</title>
+
+  <link rel="stylesheet" href="demo.css">
 </head>
 <body>
+  <div id="twoBar" class="section">
+    <div class="name">Two Bar</div>
+    <div id="huePrev" class="display">Hue</div>
+    <div id="brightPrev" class="display">Brightness + Hue</div>
+  </div>
+  <div id="twoBarHorizontal" class="section">
+    <div class="name">Two Bar Horizontal</div>
+    <div id="huePrev" class="display">Hue</div>
+    <div id="brightPrev" class="display">Brightness + Hue</div>
+  </div>
+  <script src="misc.js"></script>
   <script src=colorpicker.js></script>
+  <script>
+  const picker = new TwoBarPicker(),
+        twoBar = $("#twoBar");
+  twoBar.prepend(picker.brightness.elem);
+  twoBar.prepend(picker.hue.elem);
+
+  const prevHue = color => {
+    $("#huePrev").textContent = color;
+  }
+
+  const prevBrightness = color => {
+    $("#brightPrev").textContent = color;
+    twoBar.style.backgroundColor = color;
+  }
+
+  picker.bindListeners(prevBrightness, prevHue);
+  </script>
 </body>
 </html>
