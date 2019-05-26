@@ -13,19 +13,25 @@ class TwoBarPicker extends ColorPicker {
   constructor(width=null, height=null, horizontal=null) {
     super()
     this.hor = !!horizontal;
-    this.width = width || 50
-    this.height = height | 512;
+    if (!this.hor) {
+      this.width = width || 50;
+      this.height = height || 512;
+    } else {
+      this.width = width || 512;
+      this.height = height || 50;
+    }
     // Picks hue
-    this.hue = TwoBarPicker.renderHueBar(this.width, this.height);
+    this.hue = TwoBarPicker.renderHueBar(this.width, this.height, this.hor);
     // Picks brightness
-    this.brightness = TwoBarPicker.renderBrightnessBar(this.width, this.height);
+    this.brightness = TwoBarPicker.renderBrightnessBar(this.width, this.height,
+      this.hor);
   }
   static renderHueBar(w, h, hor) {
     const canv = $createCanv(w, h),
           ctx = canv.getContext("2d"),
           grad = ctx.createLinearGradient(0, 0, w * !!hor, h * !hor),
           colors = ["#f00", "#ff0", "#0f0", "#0ff", "#00f", "#f0f", "#f00"];
-
+    console.log(0, 0, w * !!hor, h * !hor)
     const canvas = {
       elem: canv,
       ctx: ctx,
