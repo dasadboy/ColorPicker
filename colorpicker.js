@@ -1,6 +1,3 @@
-const $ = document.querySelector.bind(document)
-      $create = document.createElement.bind(document);
-
 const $createCanv = (width, height) => {
   const canv = $create("canvas");
   canv.height = height;
@@ -9,18 +6,12 @@ const $createCanv = (width, height) => {
 }
 
 class ColorPicker {
-  constructor(pointer=null) {
-    if (pointer) {
-      this.pointer = $create("div")
-    } else {
-      this.pointer = null
-    }
-  }
+  constructor() {}
 }
 
 class TwoBarPicker extends ColorPicker {
-  constructor(pointer=null, width=null, height=null, horizontal=null) {
-    super(pointer);
+  constructor(width=null, height=null, horizontal=null) {
+    super()
     this.hor = !!horizontal;
     this.width = width || 50
     this.height = height | 512;
@@ -82,6 +73,24 @@ class TwoBarPicker extends ColorPicker {
       return hex;
     }
 
+    const getPosX = x => {
+      let current = canvas;
+      while (!!current) {
+        x -= (current.offsetLeft + current.scrollLeft);
+        current = current.parentElement;
+      }
+      return x;
+    }
+
+    const getPosY = y => {
+      let current = canvas;
+      while (!!current) {
+        y -= (current.offsetLeft + current.scrollLeft);
+        current = current.parentElement;
+      }
+      return y;
+    }
+
     const getColor = (x, y) => {
       let xCoord = Math.min(Math.max(x, 0), canvas.offsetWidth - 1),
           yCoord = Math.min(Math.max(y, 0), canvas.offsetHeight - 1);
@@ -113,10 +122,8 @@ class TwoBarPicker extends ColorPicker {
 
     const init = e => {
       const color = getColor(
-        e.pageX - canvas.offsetLeft,
-        e.pageY - canvas.offsetTop,
-        canvas.offsetLeft,
-        canvas.offsetTop
+        getPosX(e.pageX),
+        getPosY(e.pageY)
       );
       update(color);
       if (callback) callback(color);
@@ -126,18 +133,16 @@ class TwoBarPicker extends ColorPicker {
 
     const drag = e => {
       const color = getColor(
-        e.pageX - canvas.offsetLeft,
-        e.pageY - canvas.offsetTop
+        getPosX(e.pageX),
+        getPosY(e.pageY)
       );
       update(color);
       if (callback) callback(color);
     }
     
-    const end = e => {
+    const end = () => {
       window.removeEventListener("mousemove", drag);
       window.removeEventListener("mouseup", end);
-      triggerDown();
-      triggerUp();
     }
 
     this.hue.elem.addEventListener("mousedown", init);
@@ -150,6 +155,24 @@ class TwoBarPicker extends ColorPicker {
       let hex = x.toString(16);
       if (hex.length === 1) hex = "0" + hex;
       return hex;
+    }
+
+    const getPosX = x => {
+      let current = canvas;
+      while (!!current) {
+        x -= (current.offsetLeft + current.scrollLeft);
+        current = current.parentElement;
+      }
+      return x;
+    }
+
+    const getPosY = y => {
+      let current = canvas;
+      while (!!current) {
+        y -= (current.offsetLeft + current.scrollLeft);
+        current = current.parentElement;
+      }
+      return y;
     }
 
     const getColor = (x, y) => {
@@ -165,27 +188,25 @@ class TwoBarPicker extends ColorPicker {
 
     const init = e => {
       const color = getColor(
-        e.pageX - canvas.offsetLeft,
-        e.pageY - canvas.offsetTop
+        getPosX(e.pageX),
+        getPosY(e.pageY)
       );
       callback(color);
       window.addEventListener("mousemove", drag);
       window.addEventListener("mouseup", end);
-      console.log("start")
     }
 
     const drag = e => {
       const color = getColor(
-        e.pageX - canvas.offsetLeft,
-        e.pageY - canvas.offsetTop,
+        getPosX(e.pageX),
+        getPosY(e.pageY)
       );
       callback(color);
     }
     
-    const end = e => {
+    const end = () => {
       window.removeEventListener("mousemove", drag);
       window.removeEventListener("mouseup", end);
-      console.log("end");
     }
 
     this.brightness.elem.addEventListener("mousedown", init);
@@ -193,5 +214,11 @@ class TwoBarPicker extends ColorPicker {
   bindListeners(brightnessCallback, hueCallback=null) {
     this.bindHueBarListeners(brightnessCallback, hueCallback);
     this.bindBrightnessBarListeners(brightnessCallback);
+  }
+}
+
+class ThreeBarPicker extends ColorPicker {
+  constructor() {
+
   }
 }
