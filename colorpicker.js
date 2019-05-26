@@ -38,12 +38,15 @@ class TwoBarPicker extends ColorPicker {
     const canvas = {
       elem: canv,
       ctx: ctx,
-      grad: grad
+      pos: {
+        x: 0,
+        y: 0
+      }
     }
     for (let i in colors) {
-      canvas.grad.addColorStop(i*0.16 + 0.02, colors[i]);
+      grad.addColorStop(i*0.16 + 0.02, colors[i]);
     }
-    canvas.ctx.fillStyle = canvas.grad;
+    canvas.ctx.fillStyle = grad;
     canvas.ctx.fillRect(0, 0, w, h);
     return canvas;
   }
@@ -54,7 +57,11 @@ class TwoBarPicker extends ColorPicker {
 
     const canvas = {
       elem: canv,
-      ctx: ctx
+      ctx: ctx,
+      pos: {
+        x: w/2,
+        y: h/2
+      }
     }
     grad.addColorStop(0.01, "#fff");
     grad.addColorStop(0.5, "#f00");
@@ -63,9 +70,10 @@ class TwoBarPicker extends ColorPicker {
     canvas.ctx.fillRect(0, 0, w, h);
     return canvas;
   }
-  bindHueBarListeners(callback=null) {
+  bindHueBarListeners(brightCallback, callback=null) {
     const canvas = this.hue.elem,
           brightCanv = this.brightness.elem,
+          brightPos = this.brightness.pos,
           brightCtx = this.brightness.ctx;
 
     const toHex = x => {
@@ -83,6 +91,15 @@ class TwoBarPicker extends ColorPicker {
       + `${toHex(imageData[2])}`;
     }
 
+    const getBrightColor = (x, y) => {
+      let xCoord = Math.min(Math.max(x, 0), brightCanv.offsetWidth - 1),
+          yCoord = Math.min(Math.max(y, 0), brightCanv.offsetHeight - 1);
+      const ctx = brightCanv.getContext("2d"),
+            imageData = ctx.getImageData(xCoord, yCoord, 1, 1).data;
+      return `#${toHex(imageData[0])}${toHex(imageData[1])}`
+      + `${toHex(imageData[2])}`;
+    }
+
     const update = c => {
       const grad = brightCtx.createLinearGradient(0, 0, this.width * !!this.hor,
         this.height * !this.hor)
@@ -91,6 +108,7 @@ class TwoBarPicker extends ColorPicker {
       grad.addColorStop(0.99, "#000")
       brightCtx.fillStyle = grad;
       brightCtx.fillRect(0, 0, this.width, this.height)
+      brightCallback(getBrightColor(brightPos.x, brightPos.y))
     }
 
     const init = e => {
@@ -115,15 +133,18 @@ class TwoBarPicker extends ColorPicker {
       if (callback) callback(color);
     }
     
-    const end = () => {
+    const end = e => {
       window.removeEventListener("mousemove", drag);
       window.removeEventListener("mouseup", end);
+      triggerDown();
+      triggerUp();
     }
 
     this.hue.elem.addEventListener("mousedown", init);
   }
   bindBrightnessBarListeners(callback) {
-    let canvas = this.brightness.elem;
+    const canvas = this.brightness.elem,
+          brightPos = this.brightness.pos;
 
     const toHex = x => {
       let hex = x.toString(16);
@@ -136,7 +157,8 @@ class TwoBarPicker extends ColorPicker {
           yCoord = Math.min(Math.max(y, 0), canvas.offsetHeight - 1);
       const ctx = canvas.getContext("2d"),
             imageData = ctx.getImageData(xCoord, yCoord, 1, 1).data;
-      console.log();
+      brightPos.x = xCoord;
+      brightPos.y = yCoord;
       return `#${toHex(imageData[0])}${toHex(imageData[1])}`
       + `${toHex(imageData[2])}`;
     }
@@ -149,6 +171,7 @@ class TwoBarPicker extends ColorPicker {
       callback(color);
       window.addEventListener("mousemove", drag);
       window.addEventListener("mouseup", end);
+      console.log("start")
     }
 
     const drag = e => {
@@ -162,12 +185,13 @@ class TwoBarPicker extends ColorPicker {
     const end = e => {
       window.removeEventListener("mousemove", drag);
       window.removeEventListener("mouseup", end);
+      console.log("end");
     }
 
     this.brightness.elem.addEventListener("mousedown", init);
   }
-  bindListeners(hueCallback=null, brightnessCallback) {
-    this.bindHueBarListeners(hueCallback);
+  bindListeners(brightnessCallback, hueCallback=null) {
+    this.bindHueBarListeners(brightnessCallback, hueCallback);
     this.bindBrightnessBarListeners(brightnessCallback);
   }
 }
