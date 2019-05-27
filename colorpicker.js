@@ -1,5 +1,5 @@
 const $createCanv = (width, height) => {
-  const canv = $create("canvas");
+  const canv = document.createElement("canvas");
   canv.height = height;
   canv.width = width;
   return canv;
