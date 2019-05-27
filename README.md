@@ -1,6 +1,3 @@
-# Color Picker
-A library of various Color Pickers.
-
 ## Getting Started
 
 Download or clone the directory.
