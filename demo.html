@@ -16,12 +16,19 @@
     <div id="huePrev2" class="display">Hue</div>
     <div id="brightPrev2" class="display">Brightness + Hue</div>
   </div>
+  <div id="threeBar" class="section">
+    <div class="name">Three Bar</div>
+    <div id="redBar" class="display">Red Bar</div>
+    <div id="greenBar" class="display">Green Bar</div>
+    <div id="blueBar" class="display">Blue Bar</div>
+    <div id="bgColor" class="display">Background</div>
+  </div>
   <script src="misc.js"></script>
   <script src=colorpicker.js></script>
   <script>
   // Two Bar Picker
   (() => {
-    const picker = new TwoBarPicker(),
+    const picker = new TwoBarPicker(null, null, null),
         twoBar = $("#twoBar");
     twoBar.prepend(picker.brightness.elem);
     twoBar.prepend(picker.hue.elem);
@@ -38,10 +45,12 @@
     picker.bindListeners(prevBrightness, prevHue);
   })();
 
+  // Horizontal Two Bar Picker
   (() => {
     const picker = new TwoBarPicker(null, null, true),
           twoBar = $("#twoBarHorizontal");
     twoBarHorizontal.prepend(picker.brightness.elem);
+    twoBarHorizontal.prepend($create("br"));
     twoBarHorizontal.prepend(picker.hue.elem);
 
     const prevHue = color => {
@@ -54,6 +63,34 @@
     }
 
     picker.bindListeners(prevBrightness, prevHue);
+  })();
+
+  (() => {
+    const picker = new ThreeBarPicker(null, null, null),
+          threeBar = $("#threeBar");
+    threeBar.prepend(picker.blue.elem);
+    threeBar.prepend(picker.green.elem);
+    threeBar.prepend(picker.red.elem);
+
+
+    const prevRed = val => {
+      $("#redBar").textContent = val;
+    }
+
+    const prevGreen = val => {
+      $("#greenBar").textContent = val;
+    }
+
+    const prevBlue = val => {
+      $("#blueBar").textContent = val;
+    }
+
+    const changeBg = color => {
+      $("#bgColor").textContent = color;
+      threeBar.style.backgroundColor = color;
+    }
+
+    picker.bindListeners(changeBg, prevRed, prevGreen, prevBlue);
   })();
   </script>
 </body>
