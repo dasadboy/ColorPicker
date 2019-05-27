@@ -18,10 +18,17 @@
   </div>
   <div id="threeBar" class="section">
     <div class="name">Three Bar</div>
-    <div id="redBar" class="display">Red Bar</div>
-    <div id="greenBar" class="display">Green Bar</div>
-    <div id="blueBar" class="display">Blue Bar</div>
-    <div id="bgColor" class="display">Background</div>
+    <div class="display">Red Bar</div>
+    <div class="display">Green Bar</div>
+    <div class="display">Blue Bar</div>
+    <div class="display">Background</div>
+  </div>
+  <div id="threeBarHorizontal" class="section">
+    <div class="name">Three Bar Horizontal</div>
+    <div class="display">Red Bar</div>
+    <div class="display">Green Bar</div>
+    <div class="display">Blue Bar</div>
+    <div class="display">Background</div>
   </div>
   <script src="misc.js"></script>
   <script src=colorpicker.js></script>
@@ -67,26 +74,58 @@
 
   (() => {
     const picker = new ThreeBarPicker(null, null, null),
-          threeBar = $("#threeBar");
+          threeBar = $("#threeBar"),
+          displays = $$("#threeBarHorizontal .display");
     threeBar.prepend(picker.blue.elem);
     threeBar.prepend(picker.green.elem);
     threeBar.prepend(picker.red.elem);
 
 
     const prevRed = val => {
-      $("#redBar").textContent = val;
+      displays[0].textContent = val;
     }
 
     const prevGreen = val => {
-      $("#greenBar").textContent = val;
+      displays[1].textContent = val;
     }
 
     const prevBlue = val => {
-      $("#blueBar").textContent = val;
+      displays[2].textContent = val;
     }
 
     const changeBg = color => {
-      $("#bgColor").textContent = color;
+      displays[3].textContent = color;
+      threeBar.style.backgroundColor = color;
+    }
+
+    picker.bindListeners(changeBg, prevRed, prevGreen, prevBlue);
+  })();
+
+  (() => {
+    const picker = new ThreeBarPicker(null, null, true),
+          threeBar = $("#threeBarHorizontal"),
+          displays = $$("#threeBarHorizontal .display");
+    threeBar.prepend(picker.blue.elem);
+    threeBar.prepend($create("br"));
+    threeBar.prepend(picker.green.elem);
+    threeBar.prepend($create("br"));
+    threeBar.prepend(picker.red.elem);
+
+
+    const prevRed = val => {
+      displays[0].textContent = val;
+    }
+
+    const prevGreen = val => {
+      displays[1].textContent = val;
+    }
+
+    const prevBlue = val => {
+      displays[2].textContent = val;
+    }
+
+    const changeBg = color => {
+      displays[3].textContent = color;
       threeBar.style.backgroundColor = color;
     }
 
