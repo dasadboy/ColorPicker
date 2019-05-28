@@ -1,7 +1,7 @@
 const $createCanv = (width, height) => {
   const canv = document.createElement("canvas");
-  canv.height = height;
   canv.width = width;
+  canv.height = height;
   return canv;
 }
 
@@ -273,7 +273,7 @@ class ThreeBarPicker extends ColorPicker {
       val: "ff"
     };
     for (let i in colors) {
-      grad.addColorStop(i*0.98 + 0.02, colors[i]);
+      grad.addColorStop(i*0.98 + 0.01, colors[i]);
     }
     canvas.ctx.fillStyle = grad;
     canvas.ctx.fillRect(0, 0, w, h);
@@ -385,5 +385,87 @@ class ThreeBarPicker extends ColorPicker {
     for (let i in bars) {
       createListeners(i);
     }
+  }
+}
+
+class SimplePicker extends ColorPicker {
+  constructor(width=null, height=null, verticle=null) {
+    super();
+    this.width = width || 512;
+    this.height = height || 256;
+    this.vert = !!verticle;
+    this.picker = SimplePicker.renderCanvas(this.width, this.height,
+      this.vert);
+  }
+  static renderCanvas(w, h, v) {
+    const elem = $createCanv(w, h),
+          ctx = elem.getContext("2d"),
+          colors = ["#f00", "#ff0", "#0f0", "#0ff", "#00f", "#f0f", "#f00"];
+
+    let grad = ctx.createLinearGradient(0, 0, w * !v, h * v);
+    for (let i in colors) grad.addColorStop(0.02 + 0.16 * i, colors[i]);
+
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h)
+
+    grad = ctx.createLinearGradient(0, 0, w * v, h * !v);
+
+    grad.addColorStop(0.01, "#fff");
+    grad.addColorStop(0.49, "#fff0");
+    grad.addColorStop(0.51, "#0000");
+    grad.addColorStop(0.99, "#000");
+
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h)
+
+    return {
+      elem: elem,
+      ctx: ctx,
+    }
+  }
+  bindListeners(callback) {
+    const canvas = this.picker.elem,
+          ctx = this.picker.ctx;
+    
+    const max = Math.max.bind(Math),
+          min = Math.min.bind(Math);
+    
+    const getHex = i => {
+      let num = i.toString(16);
+      if (num.length === 1) {
+        num = "0" + num;
+      }
+      return num;
+    }
+    const getColor = (pageX, pageY) => {
+      let current = canvas, totalOffsetX = 0, totalOffsetY = 0;
+      while (current.parentElement) {
+        totalOffsetX += current.offsetLeft + current.scrollLeft
+        totalOffsetY += current.offsetTop + current.scrollTop
+        current = current.parentElement;
+      }
+      const x = min(max(0, pageX - totalOffsetX), this.width - 1),
+            y = min(max(0, pageY - totalOffsetY), this.height - 1);
+      const color = "#" + [...ctx.getImageData(x, y, 1, 1).data].slice(0, 3)
+        .map(n => getHex(n)).join("");
+      return color;
+    }
+
+    const init = e => {
+      callback(getColor(e.pageX, e.pageY))
+      window.addEventListener("mousemove", drag);
+      window.addEventListener("mouseup", end);
+    }
+
+    const drag = e => {
+      callback(getColor(e.pageX, e.pageY));
+    }
+
+    const end = e => {
+      window.removeEventListener("mousemove", drag);
+      window.removeEventListener("mouseup", end);
+    }
+
+    canvas.addEventListener("mousedown", init);
   }
 }
