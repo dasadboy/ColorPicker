@@ -10,11 +10,15 @@
     <div class="name">Two Bar</div>
     <div id="huePrev" class="display">Hue</div>
     <div id="brightPrev" class="display">Brightness + Hue</div>
+    <div class="dropCode inactive">See code <span></span></div>
+    <div class="code close"></div>
   </div>
   <div id="twoBarHorizontal" class="section">
     <div class="name">Two Bar Horizontal</div>
     <div id="huePrev2" class="display">Hue</div>
     <div id="brightPrev2" class="display">Brightness + Hue</div>
+    <div class="dropCode inactive">See code <span></span></div>
+    <div class="code close"></div>
   </div>
   <div id="threeBar" class="section">
     <div class="name">Three Bar</div>
@@ -22,6 +26,8 @@
     <div class="display">Green Bar</div>
     <div class="display">Blue Bar</div>
     <div class="display">Background</div>
+    <div class="dropCode inactive">See code <span></span></div>
+    <div class="code close"></div>
   </div>
   <div id="threeBarHorizontal" class="section">
     <div class="name">Three Bar Horizontal</div>
@@ -29,107 +35,189 @@
     <div class="display">Green Bar</div>
     <div class="display">Blue Bar</div>
     <div class="display">Background</div>
+    <div class="dropCode inactive">See code <span></span></div>
+    <div class="code close"></div>
+  </div>
+  <div id="simplePicker" class="section">
+    <div class="name">Simple Picker</div>
+    <div class="display">Background</div>
+    <div class="dropCode inactive">See code <span></span></div>
+    <div class="code close"></div>
   </div>
   <script src="misc.js"></script>
   <script src=colorpicker.js></script>
   <script>
+  const parseCode = (f, div) => {
+    let func = f.toString().split("\n").slice(1, -1);
+    const button  = div.querySelector(".dropCode"),
+          codeDiv = div.querySelector(".code");
+    const indent = (() => {
+      let i = 0, s = func[0];
+      while (s[i] === " ") {
+        i++
+      }
+      return i;
+    })();
+
+    button.addEventListener("click", () =>  toggleCodeDiv(codeDiv, button));
+    codeDiv.textContent = func.map(line => line.slice(indent)).join("\n");
+  }
+
+  const toggleCodeDiv = (code, button) => {
+    if (button.className === "dropCode active") {
+      button.className = "dropCode inactive";
+      code.className = "code close";
+    } else {
+      button.className = "dropCode active";
+      code.className = "code open";
+    }
+  }
+  
   // Two Bar Picker
   (() => {
-    const picker = new TwoBarPicker(null, null, null),
-        twoBar = $("#twoBar");
-    twoBar.prepend(picker.brightness.elem);
-    twoBar.prepend(picker.hue.elem);
+    const displayPicker = () => {
+      const picker = new TwoBarPicker(null, null, null),
+            twoBar = $("#twoBar");
+      twoBar.prepend(picker.brightness.elem);
+      twoBar.prepend(picker.hue.elem);
 
-    const prevHue = color => {
-      $("#huePrev").textContent = color;
+      const prevHue = color => {
+        $("#huePrev").textContent = color;
+      }
+
+      const prevBrightness = color => {
+        $("#brightPrev").textContent = color;
+        twoBar.style.backgroundColor = color;
+      }
+
+      picker.bindListeners(prevBrightness, prevHue);
     }
 
-    const prevBrightness = color => {
-      $("#brightPrev").textContent = color;
-      twoBar.style.backgroundColor = color;
-    }
+    displayPicker();
 
-    picker.bindListeners(prevBrightness, prevHue);
+    parseCode(displayPicker, $("#twoBar"));
   })();
 
   // Horizontal Two Bar Picker
   (() => {
-    const picker = new TwoBarPicker(null, null, true),
-          twoBar = $("#twoBarHorizontal");
-    twoBarHorizontal.prepend(picker.brightness.elem);
-    twoBarHorizontal.prepend($create("br"));
-    twoBarHorizontal.prepend(picker.hue.elem);
+    const displayPicker = () => {
+      const picker = new TwoBarPicker(null, null, true),
+            twoBar = $("#twoBarHorizontal");
+      twoBarHorizontal.prepend(picker.brightness.elem);
+      twoBarHorizontal.prepend($create("br"));
+      twoBarHorizontal.prepend(picker.hue.elem);
 
-    const prevHue = color => {
-      $("#huePrev2").textContent = color;
+      const prevHue = color => {
+        $("#huePrev2").textContent = color;
+      }
+
+      const prevBrightness = color => {
+        $("#brightPrev2").textContent = color;
+        twoBarHorizontal.style.backgroundColor = color;
+      }
+
+      picker.bindListeners(prevBrightness, prevHue);
     }
+    
+    displayPicker();
 
-    const prevBrightness = color => {
-      $("#brightPrev2").textContent = color;
-      twoBarHorizontal.style.backgroundColor = color;
-    }
-
-    picker.bindListeners(prevBrightness, prevHue);
+    parseCode(displayPicker, $("#twoBarHorizontal"))
   })();
 
+  // Three Bar Picker
   (() => {
-    const picker = new ThreeBarPicker(null, null, null),
-          threeBar = $("#threeBar"),
-          displays = $$("#threeBarHorizontal .display");
-    threeBar.prepend(picker.blue.elem);
-    threeBar.prepend(picker.green.elem);
-    threeBar.prepend(picker.red.elem);
+    const displayPicker = () => {
+      const picker = new ThreeBarPicker(null, null, null),
+            threeBar = $("#threeBar"),
+            displays = $$("#threeBar .display");
+      threeBar.prepend(picker.blue.elem);
+      threeBar.prepend(picker.green.elem);
+      threeBar.prepend(picker.red.elem);
 
 
-    const prevRed = val => {
-      displays[0].textContent = val;
+      const prevRed = val => {
+        displays[0].textContent = val;
+      }
+
+      const prevGreen = val => {
+        displays[1].textContent = val;
+      }
+
+      const prevBlue = val => {
+        displays[2].textContent = val;
+      }
+
+      const changeBg = color => {
+        displays[3].textContent = color;
+        threeBar.style.backgroundColor = color;
+      }
+
+      picker.bindListeners(changeBg, prevRed, prevGreen, prevBlue);
     }
 
-    const prevGreen = val => {
-      displays[1].textContent = val;
-    }
+    displayPicker();
 
-    const prevBlue = val => {
-      displays[2].textContent = val;
-    }
-
-    const changeBg = color => {
-      displays[3].textContent = color;
-      threeBar.style.backgroundColor = color;
-    }
-
-    picker.bindListeners(changeBg, prevRed, prevGreen, prevBlue);
+    parseCode(displayPicker, $("#threeBar"));
   })();
 
+  // Three Bar Horizontal
   (() => {
-    const picker = new ThreeBarPicker(null, null, true),
-          threeBar = $("#threeBarHorizontal"),
-          displays = $$("#threeBarHorizontal .display");
-    threeBar.prepend(picker.blue.elem);
-    threeBar.prepend($create("br"));
-    threeBar.prepend(picker.green.elem);
-    threeBar.prepend($create("br"));
-    threeBar.prepend(picker.red.elem);
+    const displayPicker = () => {
+      const picker = new ThreeBarPicker(null, null, true),
+            threeBar = $("#threeBarHorizontal"),
+            displays = $$("#threeBarHorizontal .display");
+      threeBar.prepend(picker.blue.elem);
+      threeBar.prepend($create("br"));
+      threeBar.prepend(picker.green.elem);
+      threeBar.prepend($create("br"));
+      threeBar.prepend(picker.red.elem);
 
 
-    const prevRed = val => {
-      displays[0].textContent = val;
+      const prevRed = val => {
+        displays[0].textContent = val;
+      }
+
+      const prevGreen = val => {
+        displays[1].textContent = val;
+      }
+
+      const prevBlue = val => {
+        displays[2].textContent = val;
+      }
+
+      const changeBg = color => {
+        displays[3].textContent = color;
+        threeBar.style.backgroundColor = color;
+      }
+
+      picker.bindListeners(changeBg, prevRed, prevGreen, prevBlue);
     }
 
-    const prevGreen = val => {
-      displays[1].textContent = val;
+    displayPicker();
+
+    parseCode(displayPicker, $("#threeBarHorizontal"));
+  })();
+
+  // Simple Picker
+  (() => {
+    const displayPicker = () => {
+      const picker = new SimplePicker(512, 256, false),
+            container = $("#simplePicker"),
+            display = $("#simplePicker .display");
+      
+      container.prepend(picker.picker.elem);
+
+      const prev = color => {
+        display.textContent = color
+        container.style.backgroundColor = color;
+      }
+
+      picker.bindListeners(prev);
     }
 
-    const prevBlue = val => {
-      displays[2].textContent = val;
-    }
+    displayPicker();
 
-    const changeBg = color => {
-      displays[3].textContent = color;
-      threeBar.style.backgroundColor = color;
-    }
-
-    picker.bindListeners(changeBg, prevRed, prevGreen, prevBlue);
+    parseCode(displayPicker, $("#simplePicker"));
   })();
   </script>
 </body>
